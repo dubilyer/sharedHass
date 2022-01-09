@@ -1,0 +1,456 @@
+button_card_templates:
+  container:
+    color_type: label-card
+    color: dimgray
+    styles:
+      card:
+        - padding: 0
+        - width: 30vw
+      name:
+        - border-radius: 0.4em 0.4em 0 0
+        - padding: 0.1em
+        - font-weight: bold
+      grid:
+        - grid-template-areas: '"i" "n" "row1" "row2" "row3"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr min-content  min-content  min-content min-content
+      custom_fields:
+        row1:
+          - background-color: 'rgba(0,0,0,0.3)'
+          - margin: 0
+          - padding: 0.3em
+        row2:
+          - background-color: 'rgba(0,0,0,0.3)'
+          - margin: 0
+          - padding: 0.3em
+        row3:
+          - background-color: 'rgba(0,0,0,0.3)'
+          - margin: 0
+          - padding: 0.3em
+  quater:
+    color_type: card
+    size: 80%
+    color: var(--secondary-background-color);
+    state:
+      - value: 'on'
+        styles:
+          icon:
+            - color: yellow
+    hold_action:
+      action: more-info
+    styles:
+      card:
+        - padding: 0.2em
+        - '--mdc-ripple-color': yellow
+        - '--mdc-ripple-press-opacity': 0.5
+      icon:
+        - opacity: 0.5
+      name:
+        - font-size: 0.65em
+        - white-space: normal
+      state:
+        - font-size: 0.65em
+        - white-space: normal
+      label:
+        - font-size: 0.4em
+        - white-space: normal
+  half:
+    template: quater
+    show_name: true
+    styles:
+      grid:
+        - position: relative
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: 1fr 1fr
+        - grid-template-rows: 1fr
+      name:
+        - font-weight: bold
+  third:
+    template: quater
+    styles:
+      grid:
+        - position: relative
+        - grid-template-areas: '"i"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr
+  one:
+    template: half
+    styles:
+      grid:
+        - position: relative
+        - grid-template-areas: '". i n ."'
+        - grid-template-columns: 1fr 1fr 1fr 1fr
+        - grid-template-rows: 1fr
+  mazgan:
+    template: quater
+    styles:
+      grid:
+        - position: relative
+        - grid-template-areas: '"i empty mode" "i current_temp mode" "i temp mode" "i humidity mode"'
+        - grid-template-columns: 1fr 1fr 1fr
+        - grid-template-rows: 0.5fr
+      custom_fields:
+        data:
+          - background-color: 'rgba(0,0,0,0.3)'
+          - margin: 0
+          - padding: 0.3em
+views:
+  - title: exp
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:button-card
+            template: container
+            name: 📺 Салон
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: light.yeelight_ceiling10_0x0000000010de88e1
+                      template: quater
+                      icon: mdi:vanity-light
+                      show_name: false
+                      type: 'custom:button-card'
+                    - entity: light.yeelight_ceiling10_0x0000000010de88e1_ambilight
+                      template: quater
+                      icon: mdi:vanity-light
+                      show_name: false
+                      type: 'custom:button-card'
+                    - entity: light.yeelight_strip6_0x00000000155d5828
+                      template: quater
+                      icon: mdi:led-strip-variant
+                      show_name: false
+                      type: 'custom:button-card'
+                    - entity: scene.kino
+                      template: quater
+                      color: var(--secondary-background-color);
+                      icon: mdi:movie-roll
+                      show_name: false
+                      type: 'custom:button-card'
+              row2:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: switch.ac
+                      template: mazgan
+                      icon: mdi:air-conditioner
+                      show_state: false
+                      show_name: false
+                      type: 'custom:button-card'
+                      custom_fields:
+                        empty: >
+                          [[[
+                            return ''
+                          ]]]
+                        mode: >
+                          [[[
+                            var icon = ''; var color = '';
+                            switch(states["climate.eduard_s_device"].state){
+                              case 'heat': icon = 'mdi:fire'; color = 'red'; break;
+                              case 'cool': icon = 'mdi:snowflake'; color = 'blue'; break;
+                              case 'dry': icon = 'mdi:water-off-outline'; color = 'aqua'; break;
+                              case 'fan_only': icon = 'mdi:fan'; color = 'black'; break;
+                              case 'heat_cool': icon = 'mdi:fan-auto'; color = 'white'; break;
+                              case 'off': icon = 'mdi:fan-off'; color = 'gray'; break;
+                            }
+                            return `<pre style ="width: 100% margin: auto"><ha-icon icon="${icon}" style="width: 5em; height: 5em; color: ${color};"></ha-icon></pre>`                          
+                          ]]]
+                        current_temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Текущая:</span><BR>
+                              <span>${states["sensor.temperature_salon"].state}°C</span>`
+                          ]]]
+                        temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Целевая:</span><BR>
+                              <span>${states["climate.eduard_s_device"].attributes.temperature}°C</span>`
+                          ]]]
+                        humidity: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:water" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Влажность:</span><BR>
+                              <span>${states["sensor.humidity_salon"].state}%</span>`
+                          ]]]
+          - type: custom:button-card
+            template: container
+            name: 👦 👧 Детская
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: light.yeelight_ct_bulb_0x0000000007f29d50
+                      template: half
+                      icon: mdi:ceiling-light
+                      type: 'custom:button-card'
+                    - entity: switch.wifi_plug_1
+                      template: half
+                      icon: mdi:bee
+                      type: 'custom:button-card'
+              row2:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: switch.ac_detskaia
+                      template: mazgan
+                      icon: mdi:air-conditioner
+                      show_state: false
+                      show_name: false
+                      type: 'custom:button-card'
+                      custom_fields:
+                        empty: >
+                          [[[
+                            return ''
+                          ]]]
+                        mode: >
+                          [[[
+                            var icon = ''; var color = '';
+                            switch(states["climate.detskaia"].state){
+                              case 'heat': icon = 'mdi:fire'; color = 'red'; break;
+                              case 'cool': icon = 'mdi:snowflake'; color = 'blue'; break;
+                              case 'dry': icon = 'mdi:water-off-outline'; color = 'aqua'; break;
+                              case 'fan_only': icon = 'mdi:fan'; color = 'black'; break;
+                              case 'heat_cool': icon = 'mdi:fan-auto'; color = 'white'; break;
+                              case 'off': icon = 'mdi:fan-off'; color = 'gray'; break;
+                            }
+                            return `<pre style ="width: 100% margin: auto"><ha-icon icon="${icon}" style="width: 5em; height: 5em; color: ${color};"></ha-icon></pre>`                          
+                          ]]]
+                        current_temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Текущая:</span><BR>
+                              <span>${states["sensor.temperature_detskaia"].state}°C</span>`
+                          ]]]
+                        temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Целевая:</span><BR>
+                              <span>${states["climate.detskaia"].attributes.temperature}°C</span>`
+                          ]]]
+                        humidity: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:water" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Влажность:</span><BR>
+                              <span>${states["sensor.humidity_detskaia"].state}%</span>`
+                          ]]]
+          - type: custom:button-card
+            template: container
+            name: 🛏 Спальня
+            custom_fields:
+              row2:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: switch.ac_spalnia
+                      template: mazgan
+                      icon: mdi:air-conditioner
+                      show_state: false
+                      show_name: false
+                      type: 'custom:button-card'
+                      custom_fields:
+                        empty: >
+                          [[[
+                            return ''
+                          ]]]
+                        mode: >
+                          [[[
+                            var icon = ''; var color = '';
+                            switch(states["climate.spalnia"].state){
+                              case 'heat': icon = 'mdi:fire'; color = 'red'; break;
+                              case 'cool': icon = 'mdi:snowflake'; color = 'blue'; break;
+                              case 'dry': icon = 'mdi:water-off-outline'; color = 'aqua'; break;
+                              case 'fan_only': icon = 'mdi:fan'; color = 'black'; break;
+                              case 'heat_cool': icon = 'mdi:fan-auto'; color = 'white'; break;
+                              case 'off': icon = 'mdi:fan-off'; color = 'gray'; break;
+                            }
+                            return `<pre style ="width: 100% margin: auto"><ha-icon icon="${icon}" style="width: 5em; height: 5em; color: ${color};"></ha-icon></pre>`                          
+                          ]]]
+                        current_temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Текущая:</span><BR>
+                              <span>${states["sensor.temperature_spalnia"].state}°C</span>`
+                          ]]]
+                        temp: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:thermometer" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Целевая:</span><BR>
+                              <span>${states["climate.spalnia"].attributes.temperature}°C</span>`
+                          ]]]
+                        humidity: >
+                          [[[
+                            return `
+                              <ha-icon icon="mdi:water" style="width: 1em; height: 1em; color: gray;"></ha-icon>
+                              <span>Влажность:</span><BR>
+                              <span>${states["sensor.humidity_spalnia"].state}%</span>`
+                          ]]]
+          - type: custom:button-card
+            template: one
+            icon: mdi:exit-run
+            name: Бай
+            tap_action:
+              action: call-service
+              service: script.bye
+            styles:
+              icon:
+                - height: 50px
+      - type: vertical-stack
+        cards:
+          - type: custom:button-card
+            template: container
+            name: 🛀 Ванная
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: light.tz3000_fvh3pjaz_ts0012_9153fcfe_on_off
+                      template: third
+                      icon: mdi:ceiling-light
+                      show_name: false
+                      type: 'custom:button-card'
+                    - entity: binary_sensor.lumi_lumi_sensor_magnet_aq2_2347f906_on_off
+                      template: third
+                      icon: >
+                        [[[
+                           return states["binary_sensor.lumi_lumi_sensor_magnet_aq2_2347f906_on_off"].state=='on'?'mdi:door-open':'mdi:door-closed';
+                        ]]]
+                      show_name: false
+                      type: 'custom:button-card'
+                    - entity: binary_sensor.bath_motion_ias_zone
+                      template: third
+                      icon: >
+                        [[[
+                          return states["binary_sensor.bath_motion_ias_zone"].state=='on'?'mdi:account':'mdi:account-cancel-outline';
+                        ]]]
+                      show_name: false
+                      type: 'custom:button-card'
+          - type: custom:button-card
+            template: container
+            name: 🧼 Прачечная
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: light.tz3000_fvh3pjaz_ts0012_9153fcfe_on_off_2
+                      template: half
+                      icon: mdi:ceiling-light
+                      name: Свет
+                      type: 'custom:button-card'
+                    - entity: sensor.washer_washer_machine_state
+                      template: half
+                      icon: mdi:washing-machine
+                      name: Стиралка
+                      type: 'custom:button-card'
+          - type: custom:button-card
+            template: container
+            name: 🚸 Корридор
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - entity: light.tz3000_9hpxg80k_ts0011_d71566fe_on_off
+                      template: one
+                      name: >
+                        [[[
+                          return 'Уголок<BR>'
+                        ]]]
+                      icon: mdi:ceiling-light
+                      type: 'custom:button-card'
+          - type: custom:button-card
+            template: container
+            name: 🎧 Медиа
+            custom_fields:
+              row1:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - type: custom:mini-media-player
+                      entity: media_player.s70pci
+                      scale: 0.7
+              row2:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - type: custom:mini-media-player
+                      entity: media_player.mibox4_2
+                      scale: 0.7
+              row3:
+                card:
+                  type: horizontal-stack
+                  cards:
+                    - type: custom:mini-media-player
+                      entity: media_player.mi_box_2
+                      scale: 0.7
+          - type: custom:button-card
+            template: container
+            name: 🕰
+            custom_fields:
+              row1:
+                card:
+                  type: custom:button-card
+                  template: one
+                  icon: mdi:clock
+                  name: >
+                    [[[
+                      var time = new Date();
+                      return `<span style="font-size: 2em">${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}</span>`;
+                    ]]]
+      - type: vertical-stack
+        cards:
+          - type: weather-forecast
+            entity: weather.home
+          - type: custom:button-card
+            template: one
+            icon: mdi:virus
+            name: >
+              [[[
+                return `<span style="font-size: 3em; color:${states['sensor.color'].state}">${states["sensor.grade"].state}%</span>`;
+              ]]]
+            styles:
+              icon:
+                - color: >
+                    [[[
+                      return states["sensor.color"].state;
+                    ]]]
+          - type: custom:vacuum-card
+            entity: vacuum.rony
+            stats:
+              default:
+                - attribute: filter_left_time
+                  unit: hours
+                  subtitle: Filter
+                - attribute: side_brush_time_left
+                  unit: hours
+                  subtitle: Side brush
+                - attribute: main_brush_time_left
+                  unit: hours
+                  subtitle: Main brush
+                - attribute: water_level
+                  subtitle: Water
+              cleaning:
+                - attribute: cleaning_area
+                  unit: m2
+                  subtitle: Cleaning area
+                - attribute: cleaning_time
+                  unit: minutes
+                  subtitle: Cleaning time
+                - attribute: total_cleaning_count
+                  subtitle: Total cleaning count
+            style: |
+              ha-card .preview {
+                background-color: var(--secondary-background-color);
+              }
